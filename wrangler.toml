@@ -1,0 +1,14 @@
+name = "snap"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
+
+# The game itself. Static files are free and never count as Worker requests.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*", "/robots.txt", "/sitemap.xml"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "snap"
+database_id = "fdb4e20b-f120-4e3b-a0cc-cf107d77d094"

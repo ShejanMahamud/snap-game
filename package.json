@@ -1,0 +1,12 @@
+{
+  "name": "snap",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:init": "wrangler d1 execute snap --file=schema.sql",
+    "db:init:remote": "wrangler d1 execute snap --remote --file=schema.sql",
+    "deploy": "wrangler deploy",
+    "set-site": "node scripts/set-site.mjs"
+  },
+  "devDependencies": { "wrangler": "^4" }
+}

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SNAP: a free rubber-band gem slicing game for your browser</title>
+<meta name="description" content="SNAP is a free, quick arcade game. Pull the rubber band, let go and slice the gems. Daily challenge, endless mode, 200 stages, a global leaderboard, and it plays offline.">
+<link rel="canonical" href="https://snap.dev-shejanmahamud.workers.dev">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SNAP">
+<meta property="og:title" content="SNAP: pull, release, slice">
+<meta property="og:description" content="Pull the rubber band, let go and slice the gems. Daily challenge, global leaderboard, plays offline. Free.">
+<meta property="og:url" content="https://snap.dev-shejanmahamud.workers.dev">
+<meta property="og:image" content="https://snap.dev-shejanmahamud.workers.dev/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SNAP logo above a glowing rubber band slicing colourful gems">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SNAP: pull, release, slice">
+<meta name="twitter:description" content="A free rubber-band gem slicing game. Beat the daily seed and climb the leaderboard.">
+<meta name="twitter:image" content="https://snap.dev-shejanmahamud.workers.dev/og-image.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SNAP">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"SNAP","description":"A free rubber-band gem slicing arcade game with a daily challenge and a global leaderboard.","url":"https://snap.dev-shejanmahamud.workers.dev","image":"https://snap.dev-shejanmahamud.workers.dev/og-image.png","genre":"Arcade","gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"playMode":"SinglePlayer"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#4047E6">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="splash" aria-hidden="true"><div class="sp-logo">SNAP</div><div class="sp-bar"><i></i></div><p>Loading</p></div>
+<div id="app">
+  <canvas id="c" aria-label="SNAP game board"></canvas>
+
+  <section id="menu" class="panel">
+    <div class="stack">
+      <div class="home-profile" aria-label="Player profile">
+        <div class="home-player"><span class="player-avatar" aria-hidden="true">✦</span><div><small>WELCOME BACK</small><b id="playerName">Player</b></div><button id="editName" class="profile-edit" type="button" aria-label="Edit player name">✎</button></div>
+        <div class="home-resources">
+          <div><span class="resource-icon trophy-icon" aria-hidden="true">🏆</span><b id="homeTrophies">0</b><small>TROPHIES</small></div>
+          <div><span class="resource-icon gem-icon" aria-hidden="true">◆</span><b id="homeGems">0</b><small>GEMS CUT</small></div>
+          <div><span class="resource-icon xp-icon" aria-hidden="true">✦</span><b id="homeXp">0</b><small>TOTAL XP</small></div>
+        </div>
+      </div>
+      <h1 class="logo" aria-label="SNAP"><span>S</span><span>N</span><span>A</span><span>P</span></h1>
+      <p class="tag">Pull. Release. Slice.</p>
+      <div class="challenge" id="challenge" hidden><span id="chTxt"></span><button id="chGo" class="btn small" type="button">Accept</button></div>
+      <button id="playStage" class="btn big" type="button">Play<small id="stageSub">Stage 1</small></button>
+      <div class="row">
+        <button id="playDaily" class="btn ghost small mode" type="button"><span>Daily</span><span class="count" id="dailyDot">New</span></button>
+        <button id="playFree" class="btn ghost small mode" type="button">Endless</button>
+        <button id="playHard" class="btn ghost small mode" type="button"><span>Hard</span><span class="lockTag" id="hardLock">LV 10</span></button>
+      </div>
+      <div class="status">
+        <div class="pill" id="streakPill"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.2 4.2 5.5 6 5.5 11.2a5.5 5.5 0 0 1-11 0c0-2.2 1-3.6 2.2-4.8.1 2 .9 3.2 2.1 3.6C10.2 8.6 10.6 5 12 2z" fill="#FF7A59"/><path d="M12 22a3.2 3.2 0 0 1-3.2-3.2c0-1.6 1.1-2.5 1.9-3.4.2 1.1.7 1.7 1.3 1.9.6-1.3.9-2.4.8-3.6 1.4 1.1 2.4 2.7 2.4 5.1A3.2 3.2 0 0 1 12 22z" fill="#FFE14D"/></svg><b id="streakN">0</b><span id="streakTag" hidden>ends tonight</span></div>
+        <button class="pill coin" id="shopBtn" type="button" aria-label="Open shop"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#FFC400" stroke="#0E1038" stroke-width="2"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#0E1038" stroke-width="2" opacity=".55"/></svg><b id="coinN">0</b></button>
+        <div class="lvpill"><span class="lv" id="lvBadge">LV 1</span><div class="xpbar"><i id="xpFill"></i></div></div>
+      </div>
+      <div class="row menu-row">
+        <button id="mapBtn" class="btn ghost small mode" type="button"><span>Stages</span><span class="count" id="starCount"></span></button>
+        <button id="hubBtn" class="btn ghost small mode" type="button"><span>Progress</span><span class="count" id="qCount">0/3</span></button>
+        <button id="boardBtn" class="btn ghost small mode" type="button">Ranks</button>
+        <button id="giftBtn" class="icobtn giftBtn" type="button" aria-label="Daily gift" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 9h18v4H3zM5 13h14v8H5zM12 9v12M12 9C9 9 7 7.5 8 6s4 .5 4 3c0-2.500 3-4.500 4-3s-1 3-4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><i></i></button>
+        <button id="helpBtn" class="icobtn" type="button" aria-label="How to play">?</button>
+      </div>
+      <button id="installBtn" class="link" type="button" hidden>Install app (works offline)</button>
+      <p class="note" id="iosHint" hidden>Tap the Share button, then Add to Home Screen.</p>
+      <p class="note offline" id="offlineTag" hidden>Works offline</p>
+    </div>
+  </section>
+
+  <section id="welcome" class="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <form id="welcomeForm" class="welcome-card" autocomplete="off">
+      <span class="welcome-mark" aria-hidden="true">✦</span>
+      <p class="eyebrow" id="welcomeEyebrow">YOUR PLAYER CARD</p>
+      <h2 id="welcomeTitle">What should we call you?</h2>
+      <p class="note" id="welcomeCopy">Pick a name for your profile and leaderboard scores.</p>
+      <label class="sr" for="welcomeName">Player name</label>
+      <input id="welcomeName" type="text" maxlength="16" minlength="2" placeholder="Your player name" autocomplete="nickname" autocapitalize="words" spellcheck="false" required>
+      <p class="welcome-error" id="welcomeError" role="alert" hidden>Please enter at least 2 characters.</p>
+      <button class="btn" type="submit" id="welcomeSubmit">Let’s play</button>
+      <button class="link" type="button" id="welcomeCancel" hidden>Cancel</button>
+    </form>
+  </section>
+
+  <section id="hub" class="panel" hidden>
+    <div class="stack">
+      <h2 class="over-h">Progress</h2>
+      <div class="card">
+        <div class="lvl-row"><span class="lv" id="hubLv">LV 1</span><b id="hubTitle">Pebble</b><span class="dim" id="hubXp"></span></div>
+        <div class="xpbar"><i id="hubFill"></i></div>
+        <dl class="kv">
+          <div><dt>Best ever</dt><dd id="hubBest">0</dd></div>
+          <div><dt>Stars</dt><dd id="hubStars"></dd></div>
+          <div><dt>Endless danger</dt><dd id="hubDiff"></dd></div>
+          <div><dt>Next unlock</dt><dd id="hubNext"></dd></div>
+        </dl>
+      </div>
+      <p class="eyebrow">Today's quests</p>
+      <div class="card"><ul class="quests" id="questList"></ul></div>
+      <p class="eyebrow" id="trophyHead">Trophies</p>
+      <div class="card"><div class="shelf" id="trophyGrid"></div><p class="note" id="trophyInfo"></p></div>
+      <p class="eyebrow" id="badgeHead">Badges</p>
+      <div class="card"><ul class="badges" id="badgeList"></ul><button id="badgeAll" class="link" type="button">Show all</button></div>
+      <p class="eyebrow">Band skins</p>
+      <div class="skins" id="skinGrid"></div>
+      <button id="hubClose" class="btn small" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="help" class="panel" hidden>
+    <div class="stack">
+      <h2 class="over-h">How to play</h2>
+      <ul class="steps">
+        <li><b>Pull</b>Drag down anywhere. A longer pull snaps harder.</li>
+        <li><b>Release</b>The band flies up and slices what it touches.</li>
+        <li><b>Chain</b>Slice many gems in one snap to grow your combo. Endless mode also earns time.</li>
+        <li><b>Stages</b>Hit the goal for one star. Beat it by more for three.</li>
+        <li><b>Fever</b>Fill the pink bar for six seconds of double points.</li>
+      </ul>
+      <div class="legend" id="legend"></div>
+      <p class="note">Keyboard: Space or Down arrow to pull, Left and Right to aim, P to pause.</p>
+      <button id="helpClose" class="btn small" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="result" class="panel" hidden>
+    <div class="stack">
+      <p class="eyebrow" id="rHead">Daily seed</p>
+      <div class="score" id="rScore" aria-live="polite">0</div>
+      <div class="badge" id="rBadge" hidden>New best</div>
+      <p class="hook" id="rHook" hidden></p>
+      <p class="rank" id="rRank" role="status" hidden></p>
+      <form class="nameForm" id="nameForm" autocomplete="off" hidden>
+        <label class="sr" for="nameIn">Your name</label>
+        <input id="nameIn" type="text" maxlength="16" placeholder="Your name" enterkeyhint="done" autocomplete="username" autocapitalize="words" spellcheck="false">
+        <button class="btn small" type="submit">Join</button>
+      </form>
+      <dl class="stats">
+        <div><dt>Best snap</dt><dd id="rSnap">0</dd></div>
+        <div><dt>Gems cut</dt><dd id="rGems">0</dd></div>
+        <div><dt>Seconds</dt><dd id="rTime">0</dd></div>
+      </dl>
+      <div class="xp" id="xpBox">
+        <div class="xp-top"><span class="lv" id="xLv">LV 1</span><div class="xpbar"><i id="xFill"></i></div><b id="xGain">+0 XP</b></div>
+        <p class="note" id="xNext"></p>
+        <ul class="qdone" id="rQuests"></ul>
+      </div>
+      <div class="levelup" id="levelUp" hidden></div>
+      <p class="coinGain" id="rCoins"></p>
+      <div id="crates"><p class="eyebrow">Pick a crate</p><div class="crow" id="crateRow"></div></div>
+      <div class="row">
+        <button id="again" class="btn" type="button">Play again</button>
+        <button id="shareBtn" class="btn ghost" type="button">Share</button>
+      </div>
+      <div class="row"><button id="boardLink" class="link" type="button">Leaderboard</button><button id="toMenu" class="link" type="button">Menu</button></div>
+      <div class="sharebox" id="shareBox" hidden>
+        <img id="cardImg" alt="Score card with your best snap" width="300" height="375">
+        <p class="note">Press and hold the card to save it.</p>
+        <button id="copyBtn" class="btn ghost small" type="button">Copy score</button>
+        <button id="nativeShare" class="btn ghost small" type="button" hidden>Share link</button>
+        <textarea id="shareText" rows="4" readonly hidden aria-label="Score text to copy"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section id="board" class="panel" hidden>
+    <div class="stack">
+      <h2 class="over-h">Ranks</h2>
+      <div class="tabs" id="boardTabs" role="group" aria-label="Leaderboard">
+        <button type="button" data-mode="daily" aria-pressed="true">Daily</button>
+        <button type="button" data-mode="weekly" aria-pressed="false">Weekly</button>
+        <button type="button" data-mode="free" aria-pressed="false">Endless</button>
+        <button type="button" data-mode="hard" aria-pressed="false">Hard</button>
+      </div>
+      <ol class="board" id="boardList" aria-live="polite"></ol>
+      <p class="note" id="boardNote"></p>
+      <form class="nameForm" id="boardNameForm" autocomplete="off">
+        <label class="sr" for="boardName">Your name</label>
+        <input id="boardName" type="text" maxlength="16" placeholder="Your name" enterkeyhint="done" spellcheck="false">
+        <button class="btn ghost small" type="submit">Save</button>
+      </form>
+      <button id="boardClose" class="btn small" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="shop" class="panel" hidden>
+    <div class="stack">
+      <h2 class="over-h">Shop</h2>
+      <div class="pill coinBal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#FFC400" stroke="#0E1038" stroke-width="2"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#0E1038" stroke-width="2" opacity=".55"/></svg><b id="shopCoins">0</b></div>
+      <p class="eyebrow">Stage boosts</p>
+      <ul class="shopList" id="shopBoosts"></ul>
+      <p class="note">Switch boosts on in a stage briefing. They never apply to the daily, endless or hard leaderboards.</p>
+      <p class="eyebrow">Band skins</p>
+      <ul class="shopList" id="shopSkins"></ul>
+      <button id="shopClose" class="btn small" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="gift" class="panel" hidden>
+    <div class="stack">
+      <p class="eyebrow" id="gHead">Daily gift</p>
+      <h2 class="over-h" id="gTitle">Day 1</h2>
+      <div class="giftRow" id="gRow"></div>
+      <div class="giftAmt" id="gAmt">+50 XP</div>
+      <p class="note" id="gNote">Come back tomorrow for more.</p>
+      <button id="gClaim" class="btn big" type="button">Claim</button>
+      <button id="gLater" class="link" type="button">Later</button>
+    </div>
+  </section>
+
+  <section id="map" class="panel" hidden>
+    <div class="stack">
+      <div class="mapHead">
+        <button id="wPrev" class="icobtn" type="button" aria-label="Previous world">&lsaquo;</button>
+        <div class="wTitle"><p class="eyebrow" id="wNum">World 1 of 20</p><h2 class="over-h" id="wName">Cobalt Cove</h2><span class="stars" id="wStars"></span><span class="twistTag" id="wTwist"></span></div>
+        <button id="wNext" class="icobtn" type="button" aria-label="Next world">&rsaquo;</button>
+      </div>
+      <div class="nodes" id="nodes"></div>
+      <button id="mapClose" class="btn small" type="button">Back</button>
+    </div>
+  </section>
+
+  <section id="brief" class="panel" hidden>
+    <div class="stack">
+      <p class="eyebrow" id="bWorld">World 1</p>
+      <h2 class="over-h" id="bTitle">Stage 1</h2>
+      <span class="stars" id="bBest"></span>
+      <p class="goalTxt" id="bGoal">Cut 10 gems</p>
+      <ul class="tiers" id="bTiers"></ul>
+      <p class="twistTag" id="bTwist"></p>
+      <div class="boosts" id="bBoosts" hidden></div>
+      <p class="note" id="bNote">40 seconds</p>
+      <button id="bStart" class="btn big" type="button">Start</button>
+      <button id="bBack" class="link" type="button">Map</button>
+    </div>
+  </section>
+
+  <section id="stageRes" class="panel" hidden>
+    <div class="stack">
+      <p class="eyebrow" id="srHead">Stage 1</p>
+      <h2 class="over-h" id="srTitle">Stage clear</h2>
+      <div class="stars xl" id="srStars"></div>
+      <div class="badge" id="srNew" hidden>New best</div>
+      <dl class="stats">
+        <div><dt>Score</dt><dd id="srScore">0</dd></div>
+        <div><dt id="srMetricLbl">Gems cut</dt><dd id="srMetric">0</dd></div>
+        <div><dt>Time left</dt><dd id="srTime">0</dd></div>
+      </dl>
+      <div class="xp">
+        <div class="xp-top"><span class="lv" id="srLv">LV 1</span><div class="xpbar"><i id="srFill"></i></div><b id="srGain">+0 XP</b></div>
+        <p class="note" id="srXpNote"></p>
+        <ul class="qdone" id="srQuests"></ul>
+      </div>
+      <div class="levelup" id="srLevelUp" hidden></div>
+      <p class="coinGain" id="srCoins"></p>
+      <div class="row">
+        <button id="srNextBtn" class="btn" type="button">Next stage</button>
+        <button id="srRetry" class="btn ghost" type="button">Retry</button>
+      </div>
+      <button id="srMap" class="link" type="button">Map</button>
+    </div>
+  </section>
+
+  <section id="pausePanel" class="panel" hidden>
+    <div class="stack">
+      <h2 class="over-h">Paused</h2>
+      <div class="row">
+        <button id="resumeBtn" class="btn" type="button">Resume</button>
+        <button id="quitBtn" class="btn ghost" type="button">Quit run</button>
+      </div>
+    </div>
+  </section>
+
+  <button id="pauseBtn" type="button" aria-label="Pause" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  <button id="mute" type="button" aria-label="Turn sound off"></button>
+</div>
+
+<div id="toast" role="status" hidden></div>
+<article class="sr" id="about">
+  <h2>SNAP: a free rubber-band gem slicing game</h2>
+  <p>SNAP is a quick arcade game you play in your browser, on a phone or a computer. Pull the rubber band down, let go, and the band flies up and slices the gems it touches. It is free, needs no sign-up, and works offline once it has loaded.</p>
+  <h2>How to play</h2>
+  <ul>
+    <li>Pull: drag down anywhere. A longer pull snaps harder.</li>
+    <li>Release: the band flies up and slices whatever it touches.</li>
+    <li>Chain: slice many gems in one snap to grow your combo.</li>
+    <li>Fever: fill the pink bar for six seconds of double points.</li>
+  </ul>
+  <h2>Controls</h2>
+  <p>Touch or mouse: drag down and release. Keyboard: Space or Down arrow to pull, Left and Right to aim, P to pause.</p>
+  <h2>Modes</h2>
+  <ul>
+    <li>Daily: everyone plays the same seed each day, with a daily leaderboard.</li>
+    <li>Endless: survive as long as you can. Weekly and all-time leaderboards.</li>
+    <li>Hard: a tougher endless run, unlocked at level 10.</li>
+    <li>Stages: 200 campaign stages across 20 worlds, with bosses and three stars each.</li>
+  </ul>
+  <p>Earn coins to unlock band skins and stage boosts in the shop. SNAP can be installed on a phone or computer like an app.</p>
+</article>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
